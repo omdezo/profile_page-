@@ -38,21 +38,23 @@ const Hero = () => {
           animate="float"
           style={{ y, textShadow }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-neon-teal/40 via-purple-400/20 to-neon-teal/40 blur-3xl animate-rotate-3d" />
-          <div className="relative transform-style-preserve-3d">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold space-y-2">
-              <span className="block bg-gradient-to-r from-neon-teal via-purple-400 to-neon-teal bg-clip-text text-transparent animate-gradient-3d">
-                {t('home.firstName')}
-              </span>
-              <span className="block bg-gradient-to-r from-purple-400 via-neon-teal to-purple-400 bg-clip-text text-transparent animate-gradient-3d delay-1000">
-                {t('home.lastName')}
-              </span>
-            </h1>
+          <div className="relative overflow-visible">
+            <div className="absolute inset-0 bg-gradient-to-r from-neon-teal/40 via-purple-400/20 to-neon-teal/40 blur-3xl animate-rotate-3d" />
+            <div className="relative transform-style-preserve-3d pb-4">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold space-y-2 leading-tight">
+                <span className="block bg-gradient-to-r from-neon-teal via-purple-400 to-neon-teal bg-clip-text text-transparent animate-gradient-3d">
+                  {t('home.firstName')}
+                </span>
+                <span className=" bg-gradient-to-r from-purple-400 via-neon-teal to-purple-400 bg-clip-text text-transparent animate-gradient-3d delay-1000">
+                  {t('home.lastName')}
+                </span>
+              </h1>
+            </div>
           </div>
         </motion.div>
 
         {/* Animated Typing Text */}
-        <div className="min-h-[60px] md:min-h-[80px] perspective-1000">
+        <div className="min-h-[60px] md:min-h-[80px] perspective-1200">
           <motion.div
             className="transform-style-preserve-3d"
             initial={{ rotateX: 45 }}
