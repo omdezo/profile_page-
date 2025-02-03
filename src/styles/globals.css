@@ -1,0 +1,396 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-space-dark text-white overflow-x-hidden;
+  }
+  
+  /* Custom neon effects */
+  .neon-glow {
+    text-shadow: 0 0 10px theme('colors.neon-teal'),
+                 0 0 20px theme('colors.neon-teal'),
+                 0 0 30px theme('colors.neon-teal');
+  }
+}
+
+@layer utilities {
+  .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 8s ease infinite;
+  }
+}
+
+@layer base {
+  /* Base styles for both LTR and RTL */
+  body {
+    @apply bg-space-dark text-white m-0 overflow-x-hidden;
+    background: radial-gradient(ellipse at bottom, #0A192F 0%, #000000 100%);
+    font-family: 'Roboto', sans-serif;
+  }
+
+  /* RTL specific styles */
+  body[dir="rtl"] {
+    font-family: 'Tajawal', sans-serif;
+  }
+
+  /* Prevent canvas interference with scrolling */
+  canvas {
+    @apply touch-none;
+  }
+}
+@keyframes quantum-pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(3); opacity: 0; }
+  }
+  
+  .quantum-text {
+    background: linear-gradient(
+      var(--gradient-angle),
+      hsl(var(--gradient-hue), 100%, 70%),
+      hsl(calc(var(--gradient-hue) + 60), 100%, 70%),
+      hsl(calc(var(--gradient-hue) + 120), 100%, 70%)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradient-shift 10s linear infinite;
+  }
+  
+  .quantum-flare {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, 
+      hsl(var(--gradient-hue), 100%, 70%) 0%,
+      transparent 70%
+    );
+    mix-blend-mode: screen;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+  
+  .quantum-cursor {
+    width: 3px;
+    height: 1.2em;
+    background: linear-gradient(to bottom, #00ffcc, #ff00ff);
+    animation: cursor-pulse 0.8s infinite;
+  }
+  
+  .quantum-cta:hover .quantum-tracer {
+    animation: tracer-flow 1.5s infinite;
+  }
+  
+  .quantum-tracer {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      45deg,
+      transparent 0%,
+      #00ffcc 50%,
+      transparent 100%
+    );
+    opacity: 0;
+  }
+  
+  .quantum-orb {
+    position: absolute;
+    width: 120%;
+    height: 120%;
+    background: radial-gradient(circle at 50% 50%, 
+      rgba(0, 255, 204, 0.3) 0%,
+      transparent 70%
+    );
+    filter: blur(20px);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  @keyframes tracer-flow {
+    0% { transform: translateX(-100%); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateX(100%); opacity: 0; }
+  }
+  
+  @keyframes gradient-shift {
+    0% { --gradient-hue: 0; }
+    100% { --gradient-hue: 360; }
+  }
+@layer utilities {
+  /* Custom glow effect */
+  .star-glow {
+    filter: drop-shadow(0 0 8px rgba(0, 255, 209, 0.5));
+  }
+  
+  /* Space-themed scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neon-teal/30 rounded-full hover:bg-neon-teal/50;
+  }
+}
+@layer base {
+    body {
+      @apply bg-space-dark text-white overflow-x-hidden;
+      background: radial-gradient(ellipse at bottom, #0A192F 0%, #000000 100%);
+      font-family: 'Roboto', sans-serif;
+    }
+  
+    body[dir="rtl"] {
+      font-family: 'Tajawal', sans-serif;
+    }
+  
+    canvas {
+      @apply touch-none;
+    }
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  .canvas-container {
+    filter: contrast(120%) brightness(110%);
+  }
+  
+  .pointer-events-none {
+    pointer-events: none;
+  }
+  .pointer-events-none {
+    pointer-events: none;
+  }
+  
+  .fixed {
+    will-change: transform; /* Optimize fixed positioning */
+  }
+  .cosmic-title {
+    background: linear-gradient(45deg, 
+      #00f7ff 25%, 
+      #ff00e6 50%, 
+      #4f00ff 75%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-shadow: 0 0 50px rgba(79,0,255,0.5),
+                 0 0 30px rgba(255,0,230,0.5),
+                 0 0 10px rgba(0,247,255,0.5);
+    animation: cosmic-glow 4s infinite alternate;
+  }
+  
+  .starship-body {
+    background: linear-gradient(45deg, 
+      #1a1a1a 20%, 
+      #0d0d0d 50%, 
+      #1a1a1a 80%);
+    clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 60%);
+  }
+  
+  .starship-thruster {
+    background: linear-gradient(to bottom, 
+      #ff4400 0%, 
+      #ff9900 100%);
+    animation: plasma-pulse 0.8s infinite;
+  }
+  
+  .plasma-core-cta {
+    background: radial-gradient(circle at center, 
+      rgba(0, 247, 255, 0.3) 0%, 
+      rgba(79, 0, 255, 0.3) 100%);
+    backdrop-filter: blur(10px);
+    border: 2px solid #00f7ff;
+    box-shadow: 0 0 30px rgba(0, 247, 255, 0.3);
+  }
+  
+  @keyframes cosmic-glow {
+    from { filter: hue-rotate(0deg); }
+    to { filter: hue-rotate(360deg); }
+  }
+  
+  @keyframes plasma-pulse {
+    0% { opacity: 0.8; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+    100% { opacity: 0.8; transform: scaleY(1); }
+  }
+  
+  .holographic-terminal {
+    background: rgba(0, 0, 30, 0.9);
+    border: 1px solid #00f7ff;
+    box-shadow: inset 0 0 20px rgba(0, 247, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, 
+      transparent 0%, 
+      #00f7ff 50%, 
+      transparent 100%);
+    animation: scan 3s linear infinite;
+  }
+  
+  @keyframes scan {
+    0% { top: -100%; }
+    100% { top: 100%; }
+  }
+  
+  .asteroid {
+    width: 10px;
+    height: 10px;
+    background: linear-gradient(45deg, 
+      #3a3a3a 0%, 
+      #1a1a1a 100%);
+    border-radius: 50%;
+    position: absolute;
+  }
+  .cosmic-title {
+    background: linear-gradient(45deg, 
+      #00f7ff 25%, 
+      #ff00e6 50%, 
+      #4f00ff 75%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-shadow: 0 0 50px rgba(79,0,255,0.5),
+                 0 0 30px rgba(255,0,230,0.5),
+                 0 0 10px rgba(0,247,255,0.5);
+    animation: cosmic-glow 4s infinite alternate;
+  }
+  
+  .starship-body {
+    background: linear-gradient(45deg, 
+      #1a1a1a 20%, 
+      #0d0d0d 50%, 
+      #1a1a1a 80%);
+    clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 60%);
+  }
+  
+  .starship-thruster {
+    background: linear-gradient(to bottom, 
+      #ff4400 0%, 
+      #ff9900 100%);
+    animation: plasma-pulse 0.8s infinite;
+  }
+  
+  .plasma-core-cta {
+    background: radial-gradient(circle at center, 
+      rgba(0, 247, 255, 0.3) 0%, 
+      rgba(79, 0, 255, 0.3) 100%);
+    backdrop-filter: blur(10px);
+    border: 2px solid #00f7ff;
+    box-shadow: 0 0 30px rgba(0, 247, 255, 0.3);
+    padding: 1rem 2rem;
+    border-radius: 9999px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  @keyframes cosmic-glow {
+    from { filter: hue-rotate(0deg); }
+    to { filter: hue-rotate(360deg); }
+  }
+  
+  @keyframes plasma-pulse {
+    0% { opacity: 0.8; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+    100% { opacity: 0.8; transform: scaleY(1); }
+  }
+  
+  .holographic-terminal {
+    background: rgba(0, 0, 30, 0.9);
+    border: 1px solid #00f7ff;
+    box-shadow: inset 0 0 20px rgba(0, 247, 255, 0.2);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, 
+      transparent 0%, 
+      #00f7ff 50%, 
+      transparent 100%);
+    animation: scan 3s linear infinite;
+  }
+  
+  @keyframes scan {
+    0% { top: -100%; }
+    100% { top: 100%; }
+  }
+  
+  .asteroid {
+    width: 10px;
+    height: 10px;
+    background: linear-gradient(45deg, 
+      #3a3a3a 0%, 
+      #1a1a1a 100%);
+    border-radius: 50%;
+    position: absolute;
+  }
+  
+  /* Optional Wormhole Background (requires Three.js) */
+  .wormhole-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+  .active-nav {
+    color: #39FFE2;
+    text-shadow: 0 0 12px rgba(57, 255, 226, 0.9);
+  }
+  
+  .cursor-cosmic {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="%2339FFE2" opacity="0.6"/></svg>') 12 12, auto;
+  }
+  .glitch-text {
+    position: relative;
+    &::before,
+    &::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    &::before {
+      left: 2px;
+      text-shadow: -2px 0 #FF00FF;
+      animation: glitch-1 2s infinite linear alternate-reverse;
+    }
+    &::after {
+      left: -2px;
+      text-shadow: 2px 0 #00FFFF;
+      animation: glitch-2 2s infinite linear alternate-reverse;
+    }
+  }
+  
+  @keyframes glitch-1 {
+    0% { clip-path: inset(20% 0 30% 0) }
+    100% { clip-path: inset(10% 0 40% 0) }
+  }
+  
+  @keyframes glitch-2 {
+    0% { clip-path: inset(40% 0 10% 0) }
+    100% { clip-path: inset(30% 0 20% 0) }
+  }
+  

@@ -1,0 +1,23 @@
+{
+  "nav": {
+    "home": "Home",
+    "portfolio": "Projects",
+    "skills":"Skills",
+    "contact":"Contact"
+  },
+  "home": {
+    "firstName": "Omar Alkindi",
+    "lastName": "Computer Engineering",
+    "subtitle": "Building tomorrow's digital experiences",
+    "subtitleAlt": "Crafting innovative web solutions",
+    "cta": "Explore My Universe"
+  },
+  "skills": {
+    "title": "My Tech Arsenal"
+  },
+  "Titels":{
+    "Skills":"My Skills",
+    "Projects":"My Projects",
+    "Contact":"Contact with me i will not eat you"
+  }
+}
