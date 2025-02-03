@@ -1,13 +1,19 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaLinkedin, FaInstagram, FaEnvelope, FaPhone, FaRocket } from 'react-icons/fa';
-function useParticles(containerRef) {
+
+/**
+ * Custom hook for particle effects.
+ * Accepts a ref to the container and an isMobile flag to adjust spawn frequency.
+ */
+function useParticles(containerRef, isMobile) {
   const [particles, setParticles] = useState([]);
 
-  // Spawn a particle at (x, y) with random properties
+  // Spawn a particle at (x, y) with random properties.
   const spawnParticle = (x, y) => {
-    // ~20% chance to actually spawn a particle on each mousemove
-    if (Math.random() < 0.8) return;
+    // On mobile, use a higher chance to skip spawning particles.
+    const spawnChance = isMobile ? 0.95 : 0.8;
+    if (Math.random() < spawnChance) return;
 
     setParticles((prev) => [
       ...prev,
@@ -24,7 +30,7 @@ function useParticles(containerRef) {
     ]);
   };
 
-  // Animate particles over time
+  // Animate particles over time.
   useEffect(() => {
     let animationId;
 
@@ -46,7 +52,7 @@ function useParticles(containerRef) {
     return () => cancelAnimationFrame(animationId);
   }, []);
 
-  // Track mouse movement within container
+  // Track mouse movement within container to spawn particles.
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!containerRef.current) return;
@@ -55,20 +61,23 @@ function useParticles(containerRef) {
     };
 
     const container = containerRef.current;
-    container.addEventListener('mousemove', handleMouseMove);
-
+    if (container) {
+      container.addEventListener('mousemove', handleMouseMove);
+    }
     return () => {
-      container.removeEventListener('mousemove', handleMouseMove);
+      if (container) {
+        container.removeEventListener('mousemove', handleMouseMove);
+      }
     };
-  }, [containerRef]);
+  }, [containerRef, isMobile]);
 
   return particles;
 }
 
 /* ----------------------------------------------------------------------------
-   3) CONTACT COMPONENT
-   The primary exported component with the main UI, form, 
-   background, and special effects.
+   CONTACT COMPONENT
+   This component includes the main UI, contact form, background effects,
+   and special animations. It adapts for mobile devices.
 ------------------------------------------------------------------------------*/
 export default function Contact() {
   const containerRef = useRef(null);
@@ -78,11 +87,22 @@ export default function Contact() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isMobile, setIsMobile] = useState(false);
 
-  // 2a) Use the custom hook for particles
-  const particles = useParticles(containerRef);
+  // Detect mobile viewport size.
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
-  // 2b) Update mousePosition for the radial glow on pointer move
+  // Use the custom hook for particles with the isMobile flag.
+  const particles = useParticles(containerRef, isMobile);
+
+  // Update mousePosition (used for the radial glow) on pointer move.
   useEffect(() => {
     const handleMousePos = (e) => {
       if (!containerRef.current) return;
@@ -93,12 +113,13 @@ export default function Contact() {
       });
     };
     const container = containerRef.current;
-    container.addEventListener('mousemove', handleMousePos);
-
-    return () => container.removeEventListener('mousemove', handleMousePos);
+    if (container) {
+      container.addEventListener('mousemove', handleMousePos);
+    }
+    return () => container && container.removeEventListener('mousemove', handleMousePos);
   }, []);
 
-  // Simulate form submission
+  // Simulate form submission.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -106,11 +127,11 @@ export default function Contact() {
     setIsSubmitting(false);
     setShowSuccess(true);
 
-    // Hide success message after 3 seconds
+    // Hide success message after 3 seconds.
     setTimeout(() => setShowSuccess(false), 3000);
   };
 
-  // Animate inputs when focused/blurred
+  // Variants for animating inputs on focus and blur.
   const inputVariants = {
     focus: {
       scale: 1.02,
@@ -122,7 +143,7 @@ export default function Contact() {
     },
   };
 
-  // Contact items & social links data
+  // Data for contact information and social links.
   const contactItems = [
     {
       icon: <FaEnvelope className="text-2xl" />,
@@ -141,7 +162,7 @@ export default function Contact() {
     { icon: <FaInstagram className="text-xl" />, href: '#instagram' },
   ];
 
-  // Form fields
+  // Form fields.
   const formFields = [
     { label: 'Name', placeholder: 'Name', isTextArea: false },
     { label: 'Email', placeholder: 'Email', isTextArea: false },
@@ -151,9 +172,9 @@ export default function Contact() {
   return (
     <div 
       ref={containerRef}
-      className="relative min-h-screen  overflow-hidden perspective-1000"
+      className="relative min-h-screen overflow-hidden perspective-1000"
     >
-      {/* 2) Particle Sprites */}
+      {/* Particle Sprites */}
       {particles.map((p) => (
         <motion.div
           key={p.id}
@@ -173,18 +194,21 @@ export default function Contact() {
         />
       ))}
 
-      {/* 3) Radial Glow for the cursor */}
+      {/* Radial Glow for the cursor.
+          The size is adjusted based on whether the device is mobile or not. */}
       <motion.div
-        className="pointer-events-none absolute w-64 h-64 rounded-full"
+        className="pointer-events-none absolute rounded-full"
         style={{
           background:
             'radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, transparent 70%)',
-          x: mousePosition.x - 128,
-          y: mousePosition.y - 128,
+          width: isMobile ? 128 : 256,
+          height: isMobile ? 128 : 256,
+          x: mousePosition.x - (isMobile ? 64 : 128),
+          y: mousePosition.y - (isMobile ? 64 : 128),
         }}
       />
 
-      {/* 4) Main Content */}
+      {/* Main Content */}
       <div className="container mx-auto px-4 py-16 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -199,7 +223,7 @@ export default function Contact() {
             {/* Glassy Card Container */}
             <div className="relative bg-gray-900/90 backdrop-blur-xl p-8 rounded-xl border border-cyan-400/30">
               
-              {/* 4a) Contact Info Cards (Centered Layout) */}
+              {/* Contact Info Cards (Centered Layout) */}
               <div className="grid md:grid-cols-2 gap-6 mb-12">
                 {contactItems.map((item, idx) => (
                   <motion.a
@@ -225,7 +249,7 @@ export default function Contact() {
                 ))}
               </div>
 
-              {/* 4b) Contact Form */}
+              {/* Contact Form */}
               <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
                 {formFields.map(({ label, placeholder, isTextArea }) => (
                   <motion.div
@@ -254,7 +278,6 @@ export default function Contact() {
                         placeholder={placeholder}
                       />
                     )}
-
                     {/* Animated bottom border */}
                     <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 transition-all duration-500 group-hover:w-full" />
                   </motion.div>
@@ -283,7 +306,7 @@ export default function Contact() {
                 </motion.button>
               </form>
 
-              {/* 4c) Success Message */}
+              {/* Success Message */}
               <AnimatePresence>
                 {showSuccess && (
                   <motion.div
@@ -302,7 +325,7 @@ export default function Contact() {
                 )}
               </AnimatePresence>
 
-              {/* 4d) Social Links */}
+              {/* Social Links */}
               <div className="flex justify-center gap-8 mt-12">
                 {socialLinks.map(({ icon, href }, idx) => (
                   <motion.a
@@ -325,7 +348,6 @@ export default function Contact() {
         .perspective-1000 {
           perspective: 1000px;
         }
-
         /* Glitch effect */
         .glitch {
           position: relative;

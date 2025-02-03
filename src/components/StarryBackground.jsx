@@ -1,24 +1,35 @@
-import React, { Suspense, useRef, useEffect, useCallback, useMemo, useState } from 'react';
+import React, {
+  Suspense,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Stars, Sparkles, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
-import { EffectComposer, Bloom, ChromaticAberration } from '@react-three/postprocessing';
+import {
+  EffectComposer,
+  Bloom,
+  ChromaticAberration,
+} from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
-
-const PARTICLE_COUNT = 500;
-const NEBULA_POINTS = 1500;
 
 /**
  * CustomParticleSystem
  * A field of twinkling particles that gently orbit.
+ * Adjusts the number of particles based on device size.
  */
-const CustomParticleSystem = React.memo(() => {
-  // Must be called inside Canvas: useFrame, useMemo
+const CustomParticleSystem = React.memo(({ isMobile }) => {
   const instancedMesh = useRef();
   const hovered = useRef(false);
+  // Use fewer particles on mobile for performance.
+  const particleCount = isMobile ? 300 : 500;
+
   const particles = useMemo(() => {
-    const arr = new Array(PARTICLE_COUNT);
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const arr = new Array(particleCount);
+    for (let i = 0; i < particleCount; i++) {
       arr[i] = {
         position: [
           (Math.random() - 0.5) * 50,
@@ -30,7 +41,7 @@ const CustomParticleSystem = React.memo(() => {
       };
     }
     return arr;
-  }, []);
+  }, [particleCount]);
 
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const materialRef = useRef();
@@ -63,7 +74,7 @@ const CustomParticleSystem = React.memo(() => {
   return (
     <instancedMesh
       ref={instancedMesh}
-      args={[null, null, PARTICLE_COUNT]}
+      args={[null, null, particleCount]}
       onPointerOver={() => (hovered.current = true)}
       onPointerOut={() => (hovered.current = false)}
     >
@@ -83,14 +94,16 @@ const CustomParticleSystem = React.memo(() => {
 /**
  * Nebula
  * A colorful cloud of points adding depth and vibrancy.
+ * Uses fewer points on mobile devices.
  */
-const Nebula = React.memo(() => {
-  // Must be called inside Canvas: useMemo
+const Nebula = React.memo(({ isMobile }) => {
   const geometryRef = useRef();
+  const nebulaPoints = isMobile ? 800 : 1500;
+
   const points = useMemo(() => {
-    const p = new Float32Array(NEBULA_POINTS * 3);
+    const p = new Float32Array(nebulaPoints * 3);
     const angleMultiplier = Math.PI * 2;
-    for (let i = 0; i < NEBULA_POINTS * 3; i += 3) {
+    for (let i = 0; i < nebulaPoints * 3; i += 3) {
       const r = 50;
       const theta = THREE.MathUtils.randFloatSpread(angleMultiplier);
       const phi = THREE.MathUtils.randFloatSpread(angleMultiplier);
@@ -99,19 +112,19 @@ const Nebula = React.memo(() => {
       p[i + 2] = r * Math.cos(theta);
     }
     return p;
-  }, []);
+  }, [nebulaPoints]);
 
   const colors = useMemo(() => {
-    const c = new Float32Array(NEBULA_POINTS * 3);
+    const c = new Float32Array(nebulaPoints * 3);
     const color1 = new THREE.Color('#FF69B4');
     const color2 = new THREE.Color('#00FFD1');
     const tempColor = new THREE.Color();
-    for (let i = 0; i < NEBULA_POINTS * 3; i += 3) {
+    for (let i = 0; i < nebulaPoints * 3; i += 3) {
       tempColor.lerpColors(color1, color2, Math.random());
       tempColor.toArray(c, i);
     }
     return c;
-  }, []);
+  }, [nebulaPoints]);
 
   useEffect(() => {
     if (geometryRef.current) {
@@ -125,13 +138,13 @@ const Nebula = React.memo(() => {
       <bufferGeometry ref={geometryRef}>
         <bufferAttribute
           attach="attributes-position"
-          count={NEBULA_POINTS}
+          count={nebulaPoints}
           array={points}
           itemSize={3}
         />
         <bufferAttribute
           attach="attributes-color"
-          count={NEBULA_POINTS}
+          count={nebulaPoints}
           array={colors}
           itemSize={3}
         />
@@ -143,7 +156,7 @@ const Nebula = React.memo(() => {
         transparent
         opacity={0.2}
         depthWrite={false}
-        fog={false} // disable fog to avoid uniform issues
+        fog={false}
       />
     </points>
   );
@@ -152,12 +165,11 @@ const Nebula = React.memo(() => {
 /**
  * CosmicBodies
  * Two standout cosmic objects with special movement:
- * 
  * - Left Body (Asteroid-like)
  * - Right Body (Star-like)
+ * Geometry sizes are scaled down on mobile.
  */
-const CosmicBodies = React.memo(() => {
-  // Must be called inside Canvas: useFrame, useTexture
+const CosmicBodies = React.memo(({ isMobile }) => {
   const leftBody = useRef();
   const rightBody = useRef();
   const scrollPercent = useRef(0);
@@ -165,13 +177,14 @@ const CosmicBodies = React.memo(() => {
   useEffect(() => {
     const onScroll = () => {
       scrollPercent.current =
-        window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+        window.scrollY /
+        (document.documentElement.scrollHeight - window.innerHeight);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Load asteroid texture within Canvas
+  // Load the asteroid texture
   const asteroidTexture = useTexture('/textures/asteroid.jpg');
 
   useFrame((state) => {
@@ -184,7 +197,8 @@ const CosmicBodies = React.memo(() => {
       const radius = 5;
       const angle = elapsed * 0.5 + scrollPercent.current * Math.PI;
       leftBody.current.position.x = baseX + Math.cos(angle) * radius;
-      leftBody.current.position.y = baseY + Math.sin(angle) * radius - scrollPercent.current * 10;
+      leftBody.current.position.y =
+        baseY + Math.sin(angle) * radius - scrollPercent.current * 10;
       leftBody.current.rotation.x += 0.005;
       leftBody.current.rotation.y += 0.01;
     }
@@ -205,7 +219,7 @@ const CosmicBodies = React.memo(() => {
     <>
       {/* Left Cosmic Body: Asteroid-like */}
       <mesh ref={leftBody}>
-        <dodecahedronGeometry args={[3.5, 0]} />
+        <dodecahedronGeometry args={[isMobile ? 2.5 : 3.5, 0]} />
         <meshStandardMaterial
           map={asteroidTexture}
           roughness={0.9}
@@ -217,7 +231,7 @@ const CosmicBodies = React.memo(() => {
 
       {/* Right Cosmic Body: Star-like */}
       <mesh ref={rightBody}>
-        <sphereGeometry args={[4, 32, 32]} />
+        <sphereGeometry args={[isMobile ? 3 : 4, 32, 32]} />
         <meshStandardMaterial
           color="#FF4500"
           emissive="#FF8C00"
@@ -235,14 +249,14 @@ const CosmicBodies = React.memo(() => {
  * Smoothly moves the camera based on scroll position.
  */
 const ScrollSync = React.memo(() => {
-  // Must be called inside Canvas: useFrame, useThree
   const { camera } = useThree();
   const targetPos = useRef(new THREE.Vector3(0, 0, 25));
   const initialPos = useRef(new THREE.Vector3(0, 0, 25));
 
   const handleScroll = useCallback(() => {
     const scrollPercent =
-      window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+      window.scrollY /
+      (document.documentElement.scrollHeight - window.innerHeight);
 
     // Example camera movement: small orbit + z shift on scroll
     targetPos.current.set(
@@ -268,15 +282,24 @@ const ScrollSync = React.memo(() => {
 
 /**
  * StableStarryBackground
- * Main component combining everything inside a <Canvas>.
+ * Combines everything inside a <Canvas> and adjusts for small devices.
  */
 const StableStarryBackground = () => {
   const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Delay mounting to avoid SSR issues in some frameworks
+  // Delay mounting to avoid SSR issues and detect viewport size
   useEffect(() => {
     setIsMounted(true);
-    return () => setIsMounted(false);
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Check once on mount and then listen to resize events
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return (
@@ -291,45 +314,45 @@ const StableStarryBackground = () => {
             stencil: false,
             depth: true,
           }}
-          dpr={Math.min(window.devicePixelRatio, 2)}
-          performance={{ min: 0.5 }}
+          dpr={Math.min(window.devicePixelRatio, isMobile ? 1 : 2)}
+          performance={{ min: isMobile ? 0.2 : 0.5 }}
         >
-          {/* Fog, lights, and base components */}
+          {/* Fog, Lights, and Base Components */}
           <fog attach="fog" args={['#000', 30, 100]} />
           <ambientLight intensity={0.1} />
           <pointLight position={[10, 10, 10]} intensity={0.8} color="#00FFD1" />
           <pointLight position={[-10, -10, -10]} intensity={0.5} color="#FF69B4" />
 
-          {/* Stars, Particles, Nebula */}
+          {/* Stars, Particles, and Nebula */}
           <Stars
             radius={100}
             depth={50}
-            count={5000}
+            count={isMobile ? 3000 : 5000}
             factor={4}
             saturation={0}
             fade
             speed={1}
           />
-          <CustomParticleSystem />
-          <Nebula />
+          <CustomParticleSystem isMobile={isMobile} />
+          <Nebula isMobile={isMobile} />
 
           {/* Suspense for loading textures */}
           <Suspense fallback={null}>
-            <CosmicBodies />
+            <CosmicBodies isMobile={isMobile} />
           </Suspense>
 
           {/* Sparkles and Postprocessing */}
           <Sparkles
-            count={100}
+            count={isMobile ? 50 : 100}
             size={2}
             speed={0.2}
             opacity={0.5}
             color="#00FFD1"
-            scale={50}
+            scale={isMobile ? 30 : 50}
           />
           <EffectComposer multisampling={0}>
             <Bloom
-              intensity={1.5}
+              intensity={isMobile ? 1.0 : 1.5}
               kernelSize={3}
               luminanceThreshold={0.2}
               luminanceSmoothing={0.3}
